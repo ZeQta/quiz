@@ -1,30 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reasoning Quiz App</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<html>
 <body>
-    <div class="quiz-container">
-        <h1>Reasoning Quiz</h1>
-        <div class="quiz-header">
-            <span id="question-number">Question 1/20</span>
-            <span id="timer">Time: 30s</span>
-            <span id="score">Score: 0</span>
-        </div>
-        <div class="question-container">
-            <p id="question"></p>
-            <div class="options">
-                <button class="option" onclick="checkAnswer(0)"></button>
-                <button class="option" onclick="checkAnswer(1)"></button>
-                <button class="option" onclick="checkAnswer(2)"></button>
-                <button class="option" onclick="checkAnswer(3)"></button>
-            </div>
-        </div>
-        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
-    </div>
-    <script src="script.js"></script>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        // Chat with Grok 3 Beta
+        puter.ai.chat(
+            "Explain quantum computing in a witty and engaging way.",
+            {model: 'x-ai/grok-3-beta'}
+        ).then(response => {
+            puter.print(response.message.content);
+        });
+    </script>
 </body>
 </html>
