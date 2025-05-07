@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grok AI Chatbot</title>
+    <title>Black Hole AI - Free Unlimited Grok-3 Powered Chatbot</title>
+    <meta name="description" content="Free unlimited AI chatbot powered by Grok-3. No signups, no limits. Experience advanced AI conversations with our black hole powered assistant.">
+    <meta name="keywords" content="free AI chatbot, Grok-3, unlimited AI, no signup chatbot, black hole AI, advanced AI assistant">
+    <meta property="og:title" content="Black Hole AI - Free Unlimited Grok-3 Chatbot">
+    <meta property="og:description" content="Experience unlimited AI conversations powered by Grok-3 with no signups or limits.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#6c5ce7">
     <script src="https://js.puter.com/v2/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #6c5ce7;
@@ -15,7 +22,23 @@
             --light-text: #636e72;
             --bg-color: #f5f6fa;
             --chat-bg: #ffffff;
+            --panel-bg: #ffffff;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-color: #dfe6e9;
+        }
+
+        .dark-mode {
+            --primary-color: #8c7ae6;
+            --secondary-color: #706fd3;
+            --user-color: #00cec9;
+            --ai-color: #8c7ae6;
+            --text-color: #f5f6fa;
+            --light-text: #b2bec3;
+            --bg-color: #2d3436;
+            --chat-bg: #1e272e;
+            --panel-bg: #1e272e;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --border-color: #3d4a54;
         }
 
         * {
@@ -23,6 +46,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
@@ -36,31 +60,149 @@
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 1.5rem;
+            padding: 1rem;
             text-align: center;
             box-shadow: var(--shadow);
             z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at center, #000000 30%, transparent 70%), 
+                        radial-gradient(circle at center, var(--primary-color) 10%, transparent 70%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle at center, #000000 40%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .history-panel {
+            width: 250px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-title {
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
         }
 
-        .header p {
+        .new-chat-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 0.6rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
             font-size: 0.9rem;
-            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            text-align: left;
+        }
+
+        .history-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item.active {
+            background-color: var(--primary-color);
+            color: white;
         }
 
         .chat-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 1rem;
             overflow: hidden;
         }
 
@@ -69,9 +211,6 @@
             overflow-y: auto;
             padding: 1rem;
             background-color: var(--chat-bg);
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            box-shadow: var(--shadow);
         }
 
         .message {
@@ -104,8 +243,8 @@
         }
 
         .ai-message {
-            background-color: #f1f2f6;
-            color: var(--text-color);
+            background-color: var(--ai-color);
+            color: white;
             border-bottom-left-radius: 4px;
         }
 
@@ -118,20 +257,20 @@
         .input-area {
             display: flex;
             gap: 0.5rem;
-            padding: 0.5rem;
-            background-color: var(--chat-bg);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
+            padding: 1rem;
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
         }
 
         #user-input {
             flex: 1;
             padding: 0.8rem 1rem;
-            border: 2px solid #dfe6e9;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            background-color: var(--panel-bg);
+            color: var(--text-color);
         }
 
         #user-input:focus {
@@ -146,25 +285,25 @@
             padding: 0 1.5rem;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         #send-button:hover {
-            background-color: #5649d2;
+            background-color: var(--secondary-color);
         }
 
         #send-button:disabled {
-            background-color: #b2bec3;
+            background-color: var(--light-text);
             cursor: not-allowed;
         }
 
         .typing-indicator {
             display: flex;
             padding: 0.8rem 1rem;
-            background-color: #f1f2f6;
+            background-color: var(--ai-color);
+            color: white;
             border-radius: 18px;
             margin-bottom: 1rem;
             width: fit-content;
@@ -174,7 +313,7 @@
         .typing-dot {
             width: 8px;
             height: 8px;
-            background-color: var(--light-text);
+            background-color: rgba(255, 255, 255, 0.7);
             border-radius: 50%;
             margin: 0 2px;
             animation: typingAnimation 1.4s infinite ease-in-out;
@@ -205,10 +344,50 @@
             text-align: center;
             padding: 2rem;
             color: var(--light-text);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .welcome-message h2 {
             margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .welcome-message p {
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            max-width: 800px;
+        }
+
+        .feature {
+            background-color: rgba(108, 92, 231, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            width: calc(50% - 0.5rem);
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .feature i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature h3 {
+            margin-bottom: 0.5rem;
             color: var(--primary-color);
         }
 
@@ -216,34 +395,114 @@
             display: none;
         }
 
-        @media (max-width: 600px) {
-            .chat-container {
-                padding: 0.5rem;
+        .error-message {
+            color: #ff7675;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .history-panel {
+                width: 200px;
             }
             
             .message-content {
                 max-width: 90%;
             }
         }
+
+        @media (max-width: 600px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .history-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 150px;
+                overflow-y: auto;
+            }
+            
+            .welcome-message h2 {
+                font-size: 1.5rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .feature {
+                width: 100%;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="light-mode">
     <div class="header">
-        <h1>Grok AI Assistant</h1>
-        <p>Powered by puter.js - No backend required</p>
+        <div class="logo-container">
+            <div class="logo"></div>
+            <div class="logo-text">Black Hole AI</div>
+        </div>
+        <div class="header-controls">
+            <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="chat-container">
-        <div class="chat-messages" id="chat-messages">
-            <div class="welcome-message">
-                <h2>Welcome to Grok AI Chat</h2>
-                <p>Ask me anything! I'm here to help with your questions.</p>
+    <div class="main-container">
+        <div class="history-panel">
+            <div class="history-header">
+                <div class="history-title">Conversations</div>
+                <button class="new-chat-btn" id="new-chat-btn">
+                    <i class="fas fa-plus"></i> New
+                </button>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- Conversation history will be added here -->
             </div>
         </div>
 
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
-            <button id="send-button">Send</button>
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <h2>Welcome to Black Hole AI</h2>
+                    <p>Experience unlimited conversations with our advanced Grok-3 powered AI assistant. No signups, no limits - just pure AI power.</p>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-bolt"></i>
+                            <h3>Lightning Fast</h3>
+                            <p>Get instant responses from our powerful AI</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-infinity"></i>
+                            <h3>Unlimited Use</h3>
+                            <p>No restrictions on messages or topics</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-lock-open"></i>
+                            <h3>No Signups</h3>
+                            <p>Start chatting immediately with no accounts</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-brain"></i>
+                            <h3>Grok-3 Powered</h3>
+                            <p>State-of-the-art AI technology</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Ask me anything..." autocomplete="off">
+                <button id="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -253,64 +512,169 @@
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const welcomeMessage = document.querySelector('.welcome-message');
+        const themeToggle = document.getElementById('theme-toggle');
+        const historyList = document.getElementById('history-list');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const body = document.body;
 
-        // Keep track of conversation history
+        // App state
         let conversationHistory = [];
         let isTyping = false;
+        let currentConversationId = generateId();
+        let conversations = {
+            [currentConversationId]: {
+                id: currentConversationId,
+                title: "New Conversation",
+                history: []
+            }
+        };
 
         // Initialize the chat
         function initChat() {
-            // Add event listeners
+            // Load saved conversations from localStorage
+            loadConversations();
+            
+            // Set up event listeners
             sendButton.addEventListener('click', sendMessage);
             userInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !isTyping) {
                     sendMessage();
                 }
             });
-
-            // Example questions
-            const exampleQuestions = [
-                "What's the meaning of life?",
-                "Tell me a fun fact about space",
-                "How does AI work?",
-                "Give me a creative idea for a weekend project"
-            ];
-
-            // Add example questions to welcome message
-            const examplesContainer = document.createElement('div');
-            examplesContainer.style.marginTop = '1.5rem';
-            examplesContainer.innerHTML = '<p style="margin-bottom: 0.5rem;">Try asking:</p>';
             
-            exampleQuestions.forEach(question => {
-                const exampleBtn = document.createElement('button');
-                exampleBtn.textContent = question;
-                exampleBtn.style.display = 'block';
-                exampleBtn.style.width = '100%';
-                exampleBtn.style.margin = '0.3rem 0';
-                exampleBtn.style.padding = '0.5rem';
-                exampleBtn.style.border = '1px solid #dfe6e9';
-                exampleBtn.style.borderRadius = '8px';
-                exampleBtn.style.backgroundColor = 'transparent';
-                exampleBtn.style.cursor = 'pointer';
-                exampleBtn.style.transition = 'all 0.2s';
-                
-                exampleBtn.addEventListener('mouseenter', () => {
-                    exampleBtn.style.backgroundColor = '#f1f2f6';
-                });
-                
-                exampleBtn.addEventListener('mouseleave', () => {
-                    exampleBtn.style.backgroundColor = 'transparent';
-                });
-                
-                exampleBtn.addEventListener('click', () => {
-                    userInput.value = question;
-                    userInput.focus();
-                });
-                
-                examplesContainer.appendChild(exampleBtn);
+            themeToggle.addEventListener('click', toggleTheme);
+            newChatBtn.addEventListener('click', startNewConversation);
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                enableDarkMode();
+            }
+            
+            // Render conversation history
+            renderHistoryList();
+            
+            // Focus the input field
+            userInput.focus();
+        }
+
+        // Generate unique ID for conversations
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Load conversations from localStorage
+        function loadConversations() {
+            const savedConversations = localStorage.getItem('blackhole-ai-conversations');
+            if (savedConversations) {
+                conversations = JSON.parse(savedConversations);
+                currentConversationId = Object.keys(conversations)[0] || currentConversationId;
+                conversationHistory = conversations[currentConversationId]?.history || [];
+            }
+        }
+
+        // Save conversations to localStorage
+        function saveConversations() {
+            localStorage.setItem('blackhole-ai-conversations', JSON.stringify(conversations));
+        }
+
+        // Render conversation history list
+        function renderHistoryList() {
+            historyList.innerHTML = '';
+            
+            Object.values(conversations).forEach(conversation => {
+                const historyItem = document.createElement('button');
+                historyItem.className = `history-item ${conversation.id === currentConversationId ? 'active' : ''}`;
+                historyItem.textContent = conversation.title;
+                historyItem.addEventListener('click', () => loadConversation(conversation.id));
+                historyList.appendChild(historyItem);
             });
+        }
+
+        // Load a specific conversation
+        function loadConversation(id) {
+            if (conversations[id]) {
+                currentConversationId = id;
+                conversationHistory = conversations[id].history;
+                
+                // Clear chat and re-render messages
+                chatMessages.innerHTML = '';
+                if (conversationHistory.length === 0) {
+                    welcomeMessage.classList.remove('hidden');
+                    chatMessages.appendChild(welcomeMessage);
+                } else {
+                    welcomeMessage.classList.add('hidden');
+                    conversationHistory.forEach(msg => {
+                        addMessage(msg.role, msg.content);
+                    });
+                }
+                
+                // Update history list active state
+                renderHistoryList();
+                userInput.focus();
+            }
+        }
+
+        // Start a new conversation
+        function startNewConversation() {
+            const newId = generateId();
+            currentConversationId = newId;
+            conversationHistory = [];
             
-            welcomeMessage.appendChild(examplesContainer);
+            conversations[newId] = {
+                id: newId,
+                title: "New Conversation",
+                history: []
+            };
+            
+            // Limit to 20 conversations and remove oldest if needed
+            const conversationIds = Object.keys(conversations);
+            if (conversationIds.length > 20) {
+                const oldestId = conversationIds.reduce((oldest, current) => {
+                    return parseInt(oldest, 36) < parseInt(current, 36) ? oldest : current;
+                });
+                delete conversations[oldestId];
+            }
+            
+            // Save and render
+            saveConversations();
+            renderHistoryList();
+            
+            // Clear chat and show welcome message
+            chatMessages.innerHTML = '';
+            welcomeMessage.classList.remove('hidden');
+            chatMessages.appendChild(welcomeMessage);
+            userInput.focus();
+        }
+
+        // Update conversation title based on first message
+        function updateConversationTitle(message) {
+            if (conversations[currentConversationId].title === "New Conversation") {
+                conversations[currentConversationId].title = message.substring(0, 30) + (message.length > 30 ? "..." : "");
+                saveConversations();
+                renderHistoryList();
+            }
+        }
+
+        // Toggle between dark and light theme
+        function toggleTheme() {
+            if (body.classList.contains('dark-mode')) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        }
+
+        function enableDarkMode() {
+            body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem('theme', 'dark');
+        }
+
+        function disableDarkMode() {
+            body.classList.remove('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', 'light');
         }
 
         // Add a message to the chat
@@ -325,12 +689,19 @@
 
             const senderDiv = document.createElement('div');
             senderDiv.className = 'message-sender';
-            senderDiv.textContent = role === 'user' ? 'You' : 'Grok AI';
+            senderDiv.textContent = role === 'user' ? 'You' : 'Black Hole AI';
             messageDiv.appendChild(senderDiv);
 
             const contentDiv = document.createElement('div');
             contentDiv.className = `message-content ${role}-message`;
-            contentDiv.textContent = content;
+            
+            // Process content for line breaks and markdown-like formatting
+            const processedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+                .replace(/\n/g, '<br>'); // Line breaks
+                
+            contentDiv.innerHTML = processedContent;
             messageDiv.appendChild(contentDiv);
 
             chatMessages.appendChild(messageDiv);
@@ -344,7 +715,7 @@
             
             const senderDiv = document.createElement('div');
             senderDiv.className = 'message-sender';
-            senderDiv.textContent = 'Grok AI';
+            senderDiv.textContent = 'Black Hole AI';
             typingDiv.appendChild(senderDiv);
 
             const typingContent = document.createElement('div');
@@ -378,10 +749,14 @@
                 content: userMessage
             });
 
+            // Update conversation title if this is the first message
+            updateConversationTitle(userMessage);
+
             // Show typing indicator
             showTypingIndicator();
             isTyping = true;
             sendButton.disabled = true;
+            userInput.disabled = true;
 
             try {
                 // Get response from Grok
@@ -395,6 +770,10 @@
                     content: response.message.content
                 });
 
+                // Update conversation in storage
+                conversations[currentConversationId].history = conversationHistory;
+                saveConversations();
+
                 // Hide typing indicator and show response
                 hideTypingIndicator();
                 addMessage('assistant', response.message.content);
@@ -403,11 +782,22 @@
             } catch (error) {
                 console.error('Error communicating with AI:', error);
                 hideTypingIndicator();
-                addMessage('assistant', "Sorry, I encountered an error. Please try again.");
+                
+                // Remove the user message from history since it failed
+                conversationHistory.pop();
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = "Sorry, our AI is currently unavailable. Please try again later.";
+                chatMessages.appendChild(errorDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
                 return "Error occurred";
             } finally {
                 isTyping = false;
                 sendButton.disabled = false;
+                userInput.disabled = false;
                 userInput.focus();
             }
         }
