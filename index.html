@@ -1,14 +1,432 @@
-<html>
-<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok AI Chatbot</title>
     <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --user-color: #00b894;
+            --ai-color: #6c5ce7;
+            --text-color: #2d3436;
+            --light-text: #636e72;
+            --bg-color: #f5f6fa;
+            --chat-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--chat-bg);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-user {
+            align-items: flex-end;
+        }
+
+        .message-ai {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 0.8rem 1rem;
+            border-radius: 18px;
+            margin-bottom: 0.3rem;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .user-message {
+            background-color: var(--user-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            background-color: #f1f2f6;
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-sender {
+            font-size: 0.75rem;
+            color: var(--light-text);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: var(--chat-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        #send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send-button:hover {
+            background-color: #5649d2;
+        }
+
+        #send-button:disabled {
+            background-color: #b2bec3;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 0.8rem 1rem;
+            background-color: #f1f2f6;
+            border-radius: 18px;
+            margin-bottom: 1rem;
+            width: fit-content;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--light-text);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            color: var(--light-text);
+        }
+
+        .welcome-message h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                padding: 0.5rem;
+            }
+            
+            .message-content {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Grok AI Assistant</h1>
+        <p>Powered by puter.js - No backend required</p>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-message">
+                <h2>Welcome to Grok AI Chat</h2>
+                <p>Ask me anything! I'm here to help with your questions.</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
     <script>
-        // Chat with Grok 3 Beta
-        puter.ai.chat(
-            "Explain quantum computing in a witty and engaging way.",
-            {model: 'x-ai/grok-3-beta'}
-        ).then(response => {
-            puter.print(response.message.content);
-        });
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const welcomeMessage = document.querySelector('.welcome-message');
+
+        // Keep track of conversation history
+        let conversationHistory = [];
+        let isTyping = false;
+
+        // Initialize the chat
+        function initChat() {
+            // Add event listeners
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !isTyping) {
+                    sendMessage();
+                }
+            });
+
+            // Example questions
+            const exampleQuestions = [
+                "What's the meaning of life?",
+                "Tell me a fun fact about space",
+                "How does AI work?",
+                "Give me a creative idea for a weekend project"
+            ];
+
+            // Add example questions to welcome message
+            const examplesContainer = document.createElement('div');
+            examplesContainer.style.marginTop = '1.5rem';
+            examplesContainer.innerHTML = '<p style="margin-bottom: 0.5rem;">Try asking:</p>';
+            
+            exampleQuestions.forEach(question => {
+                const exampleBtn = document.createElement('button');
+                exampleBtn.textContent = question;
+                exampleBtn.style.display = 'block';
+                exampleBtn.style.width = '100%';
+                exampleBtn.style.margin = '0.3rem 0';
+                exampleBtn.style.padding = '0.5rem';
+                exampleBtn.style.border = '1px solid #dfe6e9';
+                exampleBtn.style.borderRadius = '8px';
+                exampleBtn.style.backgroundColor = 'transparent';
+                exampleBtn.style.cursor = 'pointer';
+                exampleBtn.style.transition = 'all 0.2s';
+                
+                exampleBtn.addEventListener('mouseenter', () => {
+                    exampleBtn.style.backgroundColor = '#f1f2f6';
+                });
+                
+                exampleBtn.addEventListener('mouseleave', () => {
+                    exampleBtn.style.backgroundColor = 'transparent';
+                });
+                
+                exampleBtn.addEventListener('click', () => {
+                    userInput.value = question;
+                    userInput.focus();
+                });
+                
+                examplesContainer.appendChild(exampleBtn);
+            });
+            
+            welcomeMessage.appendChild(examplesContainer);
+        }
+
+        // Add a message to the chat
+        function addMessage(role, content) {
+            // Hide welcome message after first user message
+            if (role === 'user' && !welcomeMessage.classList.contains('hidden')) {
+                welcomeMessage.classList.add('hidden');
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${role}`;
+
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'message-sender';
+            senderDiv.textContent = role === 'user' ? 'You' : 'Grok AI';
+            messageDiv.appendChild(senderDiv);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `message-content ${role}-message`;
+            contentDiv.textContent = content;
+            messageDiv.appendChild(contentDiv);
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message message-ai';
+            
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'message-sender';
+            senderDiv.textContent = 'Grok AI';
+            typingDiv.appendChild(senderDiv);
+
+            const typingContent = document.createElement('div');
+            typingContent.className = 'typing-indicator';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'typing-dot';
+                typingContent.appendChild(dot);
+            }
+            
+            typingDiv.appendChild(typingContent);
+            typingDiv.id = 'typing-indicator';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Continue conversation with Grok AI
+        async function continueConversation(userMessage) {
+            // Add user message to history
+            conversationHistory.push({
+                role: "user",
+                content: userMessage
+            });
+
+            // Show typing indicator
+            showTypingIndicator();
+            isTyping = true;
+            sendButton.disabled = true;
+
+            try {
+                // Get response from Grok
+                const response = await puter.ai.chat(conversationHistory, {
+                    model: 'x-ai/grok-3-beta'
+                });
+
+                // Add Grok's response to history
+                conversationHistory.push({
+                    role: "assistant",
+                    content: response.message.content
+                });
+
+                // Hide typing indicator and show response
+                hideTypingIndicator();
+                addMessage('assistant', response.message.content);
+                
+                return response.message.content;
+            } catch (error) {
+                console.error('Error communicating with AI:', error);
+                hideTypingIndicator();
+                addMessage('assistant', "Sorry, I encountered an error. Please try again.");
+                return "Error occurred";
+            } finally {
+                isTyping = false;
+                sendButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        // Send a message
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '' || isTyping) return;
+
+            // Add user message to UI
+            addMessage('user', message);
+            userInput.value = '';
+
+            // Get AI response
+            await continueConversation(message);
+        }
+
+        // Initialize the chat when the page loads
+        window.addEventListener('DOMContentLoaded', initChat);
     </script>
 </body>
 </html>
