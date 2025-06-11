@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cluade - AI Chatbot</title>
+    <title>Claude</title>
     <script src="https://js.puter.com/v2/"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
@@ -17,280 +17,412 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a1a;
+            color: #e5e5e5;
             height: 100vh;
             display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+            display: flex;
             flex-direction: column;
+            height: 100vh;
         }
 
-        .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #333;
         }
 
-        .header h1 {
-            color: white;
-            font-size: 1.8rem;
+        .sidebar-title {
+            color: #fff;
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .new-chat-btn {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 12px;
+            padding: 12px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            color: #e5e5e5;
+            font-size: 14px;
+            cursor: pointer;
             width: 100%;
-            height: 100%;
+            margin-bottom: 16px;
+            transition: background 0.2s;
         }
 
-        .messages {
+        .new-chat-btn:hover {
+            background: #333;
+        }
+
+        .new-chat-icon {
+            width: 20px;
+            height: 20px;
+            background: #d97706;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .chats-section {
+            padding: 0 16px;
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+        }
+
+        .chats-title {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .recents-title {
+            color: #888;
+            font-size: 14px;
+            margin: 24px 0 12px 0;
+        }
+
+        .chat-item {
+            padding: 8px 12px;
+            color: #ccc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-item:hover {
+            background: #2a2a2a;
+        }
+
+        .chat-item.active {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .user-section {
+            padding: 16px;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #d97706;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-plan {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .main-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            scroll-behavior: smooth;
+            height: 100vh;
         }
 
-        .message {
-            max-width: 80%;
-            padding: 1rem 1.5rem;
-            border-radius: 18px;
-            word-wrap: break-word;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            border-bottom-right-radius: 6px;
-        }
-
-        .message.ai {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            border-bottom-left-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .message.ai.streaming {
-            border-left: 3px solid #667eea;
-        }
-
-        .message-content {
-            line-height: 1.6;
-        }
-
-        .message-content h1, .message-content h2, .message-content h3 {
-            margin: 1rem 0 0.5rem 0;
-            color: #2c3e50;
-        }
-
-        .message-content h1 { font-size: 1.5rem; }
-        .message-content h2 { font-size: 1.3rem; }
-        .message-content h3 { font-size: 1.1rem; }
-
-        .message-content p {
-            margin: 0.5rem 0;
-        }
-
-        .message-content ul, .message-content ol {
-            margin: 0.5rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .message-content blockquote {
-            border-left: 4px solid #667eea;
-            padding-left: 1rem;
-            margin: 1rem 0;
-            font-style: italic;
-            color: #666;
-        }
-
-        .code-block {
-            position: relative;
-            margin: 1rem 0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #1e1e1e;
-        }
-
-        .code-header {
-            background: #2d2d2d;
-            padding: 0.5rem 1rem;
+        .top-bar {
+            padding: 12px 24px;
+            border-bottom: 1px solid #333;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #404040;
+            justify-content: space-between;
         }
 
-        .code-language {
-            color: #888;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-
-        .copy-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2a2a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
             cursor: pointer;
+        }
+
+        .upgrade-btn {
+            background: none;
+            border: 1px solid #444;
+            color: #888;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            max-width: 600px;
+            padding: 0 24px;
+        }
+
+        .claude-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 24px;
+            color: #d97706;
+            font-size: 48px;
+        }
+
+        .welcome-text {
+            color: #ccc;
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 48px;
+        }
+
+        .suggestion-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .suggestion-btn {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #e5e5e5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             transition: all 0.2s;
         }
 
-        .copy-btn:hover {
-            background: #5a6fd8;
-            transform: translateY(-1px);
+        .suggestion-btn:hover {
+            background: #333;
+            border-color: #555;
         }
 
-        .copy-btn.copied {
-            background: #27ae60;
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: none;
         }
 
-        .code-content {
-            padding: 1rem;
-            overflow-x: auto;
+        .message {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
 
-        .code-content code {
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
+        .message.user {
+            flex-direction: row-reverse;
         }
 
-        .inline-code {
-            background: rgba(0, 0, 0, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9em;
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.user {
+            background: #d97706;
+            color: white;
+        }
+
+        .message-avatar.ai {
+            background: #2a2a2a;
+            color: #d97706;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: calc(100% - 44px);
+        }
+
+        .message-text {
+            background: #2a2a2a;
+            padding: 16px;
+            border-radius: 8px;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-text {
+            background: #1a4b3a;
         }
 
         .input-area {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 24px;
+            border-top: 1px solid #333;
         }
 
         .input-container {
-            display: flex;
-            gap: 0.75rem;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
+            position: relative;
         }
 
         .input-field {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 16px 60px 16px 20px;
+            color: #fff;
+            font-size: 16px;
             outline: none;
-            transition: all 0.3s ease;
             resize: none;
-            min-height: 50px;
-            max-height: 150px;
+            min-height: 56px;
+            max-height: 200px;
         }
 
         .input-field:focus {
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            border-color: #555;
         }
 
         .send-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #d97706;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .send-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
         }
 
         .send-btn:disabled {
-            opacity: 0.6;
+            background: #666;
             cursor: not-allowed;
+        }
+
+        .artifact-container {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .artifact-header {
+            background: #2a2a2a;
+            padding: 12px 16px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .artifact-title {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .artifact-type {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .artifact-content {
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .artifact-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
         }
 
         .typing-indicator {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #667eea;
+            gap: 8px;
+            color: #888;
             font-style: italic;
-            margin-top: 0.5rem;
+            margin-top: 8px;
         }
 
         .typing-dots {
             display: flex;
-            gap: 0.25rem;
+            gap: 4px;
         }
 
         .typing-dot {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
-            background: #667eea;
+            background: #888;
             animation: bounce 1.4s ease-in-out infinite both;
         }
 
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        .clear-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: auto;
-        }
-
-        .clear-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
         @keyframes bounce {
             0%, 80%, 100% {
@@ -301,69 +433,144 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
-            }
-            
-            .message {
-                max-width: 90%;
-                padding: 1rem;
-            }
-            
-            .input-container {
-                flex-direction: column;
-            }
-            
-            .send-btn {
-                align-self: flex-end;
-                padding: 0.75rem 1.5rem;
-            }
+        .hidden {
+            display: none !important;
         }
 
-        .hljs {
-            background: #1e1e1e !important;
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                z-index: 1000;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🤖 Cluade</h1>
-        <div class="subtitle">AI Chatbot with Contextual Memory</div>
-        <button class="clear-btn" onclick="clearConversation()">Clear Chat</button>
-    </div>
-    
-    <div class="chat-container">
-        <div class="messages" id="messages">
-            <div class="message ai">
-                <div class="message-content">
-                    <p>👋 Hello! I'm <strong>Cluade</strong>, your AI assistant. I can help you with coding, writing, analysis, and much more. I'll remember our conversation context to provide better assistance!</p>
-                    <p>Feel free to ask me anything - I support code syntax highlighting and can format responses beautifully.</p>
-                </div>
-            </div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Claude</div>
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <div class="new-chat-icon">+</div>
+                New chat
+            </button>
         </div>
         
+        <div class="chats-section">
+            <div class="chats-title">Chats</div>
+            <div class="recents-title">Recents</div>
+            <div id="chatHistory"></div>
+        </div>
+        
+        <div class="user-section">
+            <div class="user-avatar">AS</div>
+            <div class="user-info">
+                <div class="user-name">Akshar S Gowda</div>
+                <div class="user-plan">Free plan</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div></div>
+            <div class="model-selector">
+                <span>Claude Sonnet 4</span>
+                <span>▼</span>
+            </div>
+            <button class="upgrade-btn">Upgrade</button>
+        </div>
+
+        <div class="chat-area">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="claude-icon">✳</div>
+                <div class="welcome-text">Hey there, Akshar</div>
+                <div class="suggestion-buttons">
+                    <button class="suggestion-btn" onclick="sendSuggestion('Write')">
+                        ✏️ Write
+                    </button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Learn')">
+                        🎓 Learn
+                    </button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Code')">
+                        </> Code
+                    </button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Life stuff')">
+                        ☕ Life stuff
+                    </button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Claude\'s choice')">
+                        ⭕ Claude's choice
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer"></div>
+        </div>
+
         <div class="input-area">
             <div class="input-container">
                 <textarea 
                     class="input-field" 
                     id="messageInput" 
-                    placeholder="Type your message here..." 
+                    placeholder="How can I help you today?"
                     rows="1"
                     onkeydown="handleKeyPress(event)"
+                    oninput="autoResize(this)"
                 ></textarea>
                 <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                    Send
+                    ➤
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        let conversationHistory = [];
+        let currentChatId = null;
+        let conversations = {};
         let isStreaming = false;
+        let currentArtifacts = {};
 
-        // Configure marked for better rendering
+        // System prompt for Claude-like behavior
+        const SYSTEM_PROMPT = `You are Claude, an AI assistant created by Anthropic. Be helpful, harmless, and honest. When creating content that would benefit from visual presentation or interactive functionality, create artifacts using the following format:
+
+<artifact type="[type]" id="[unique-id]" title="[title]">
+[content]
+</artifact>
+
+Artifact types:
+- "text/html" for HTML pages, interactive demos, visualizations
+- "text/markdown" for documents, guides, reports  
+- "application/vnd.ant.code" for code snippets with language specified
+- "image/svg+xml" for SVG graphics
+- "application/vnd.ant.react" for React components
+
+Use artifacts for:
+- Substantial content (>20 lines or >1500 chars)
+- Content meant for reference or reuse
+- Interactive demos, visualizations, games
+- Complete code solutions
+- Creative writing pieces
+- Structured documents
+
+Always create complete, functional artifacts. For HTML artifacts, include all necessary CSS and JavaScript inline. Make them visually appealing and fully functional.`;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConversations();
+            document.getElementById('messageInput').focus();
+        });
+
+        // Configure marked for markdown parsing
         marked.setOptions({
             highlight: function(code, lang) {
                 if (lang && hljs.getLanguage(lang)) {
@@ -384,12 +591,22 @@
 
         function autoResize(textarea) {
             textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
         }
 
-        document.getElementById('messageInput').addEventListener('input', function() {
-            autoResize(this);
-        });
+        function sendSuggestion(type) {
+            const suggestions = {
+                'Write': 'Help me write a professional email',
+                'Learn': 'Explain quantum computing in simple terms',
+                'Code': 'Create a simple to-do list app in HTML/CSS/JS',
+                'Life stuff': 'Give me some productivity tips for working from home',
+                'Claude\'s choice': 'Surprise me with something interesting!'
+            };
+            
+            const message = suggestions[type] || type;
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
 
         async function sendMessage() {
             const input = document.getElementById('messageInput');
@@ -398,108 +615,135 @@
             
             if (!message || isStreaming) return;
             
+            // Create new chat if needed
+            if (!currentChatId) {
+                currentChatId = 'chat_' + Date.now();
+                conversations[currentChatId] = {
+                    id: currentChatId,
+                    title: message.substring(0, 50) + (message.length > 50 ? '...' : ''),
+                    messages: [],
+                    createdAt: Date.now()
+                };
+            }
+            
+            // Hide welcome screen and show messages
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('messagesContainer').classList.remove('hidden');
+            
             // Add user message
             addMessage(message, 'user');
-            conversationHistory.push({role: 'user', content: message});
+            conversations[currentChatId].messages.push({
+                role: 'user',
+                content: message,
+                timestamp: Date.now()
+            });
             
-            // Clear input and reset height
+            // Clear input
             input.value = '';
             input.style.height = 'auto';
             
             // Disable send button
             isStreaming = true;
             sendBtn.disabled = true;
-            sendBtn.textContent = 'Sending...';
             
-            // Create AI message container
-            const aiMessageDiv = addMessage('', 'ai', true);
-            const contentDiv = aiMessageDiv.querySelector('.message-content');
-            
-            // Add typing indicator
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'typing-indicator';
-            typingIndicator.innerHTML = `
-                <span>Cluade is thinking</span>
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
-            contentDiv.appendChild(typingIndicator);
+            // Add AI message with typing indicator
+            const aiMessageEl = addMessage('', 'assistant', true);
             
             try {
-                // Build context from conversation history
-                let contextPrompt = message;
-                if (conversationHistory.length > 1) {
-                    const recentHistory = conversationHistory.slice(-6); // Keep last 6 messages for context
-                    const contextMessages = recentHistory.slice(0, -1).map(msg => 
-                        `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}`
-                    ).join('\n\n');
-                    contextPrompt = `Previous conversation context:\n${contextMessages}\n\nCurrent question: ${message}`;
+                // Prepare context
+                const messages = conversations[currentChatId].messages;
+                let contextPrompt = SYSTEM_PROMPT + '\n\nConversation:\n';
+                
+                // Include recent conversation history
+                const recentMessages = messages.slice(-10);
+                for (const msg of recentMessages) {
+                    contextPrompt += `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}\n\n`;
                 }
                 
+                // Stream response
                 const response = await puter.ai.chat(contextPrompt, {
                     model: 'claude-sonnet-4',
                     stream: true
                 });
                 
-                // Remove typing indicator
-                typingIndicator.remove();
-                
                 let fullResponse = '';
                 for await (const part of response) {
                     if (part?.text) {
                         fullResponse += part.text;
-                        contentDiv.innerHTML = formatMessage(fullResponse);
-                        highlightCode();
-                        scrollToBottom();
+                        updateMessage(aiMessageEl, fullResponse);
                     }
                 }
                 
-                // Add to conversation history
-                conversationHistory.push({role: 'assistant', content: fullResponse});
+                // Save complete response
+                conversations[currentChatId].messages.push({
+                    role: 'assistant',
+                    content: fullResponse,
+                    timestamp: Date.now()
+                });
                 
-                // Remove streaming class
-                aiMessageDiv.classList.remove('streaming');
+                // Process artifacts
+                processArtifacts(fullResponse, aiMessageEl);
                 
             } catch (error) {
                 console.error('Error:', error);
-                typingIndicator.remove();
-                contentDiv.innerHTML = `<p style="color: #e74c3c;">❌ Sorry, I encountered an error. Please try again.</p>`;
+                updateMessage(aiMessageEl, 'I apologize, but I encountered an error. Please try again.');
             }
             
             // Re-enable send button
             isStreaming = false;
             sendBtn.disabled = false;
-            sendBtn.textContent = 'Send';
             
+            // Save conversations and update UI
+            saveConversations();
+            updateChatHistory();
             scrollToBottom();
         }
 
-        function addMessage(content, sender, streaming = false) {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}${streaming ? ' streaming' : ''}`;
+        function addMessage(content, role, showTyping = false) {
+            const container = document.getElementById('messagesContainer');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${role}`;
             
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${role}`;
+            avatar.textContent = role === 'user' ? 'AS' : '✳';
             
-            if (sender === 'user') {
-                contentDiv.textContent = content;
+            const contentEl = document.createElement('div');
+            contentEl.className = 'message-content';
+            
+            const textEl = document.createElement('div');
+            textEl.className = 'message-text';
+            
+            if (showTyping) {
+                const typingEl = document.createElement('div');
+                typingEl.className = 'typing-indicator';
+                typingEl.innerHTML = `
+                    <span>Claude is thinking</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                textEl.appendChild(typingEl);
             } else {
-                contentDiv.innerHTML = formatMessage(content);
+                textEl.innerHTML = role === 'user' ? escapeHtml(content) : formatMessage(content);
             }
             
-            messageDiv.appendChild(contentDiv);
-            messagesDiv.appendChild(messageDiv);
+            contentEl.appendChild(textEl);
+            messageEl.appendChild(avatar);
+            messageEl.appendChild(contentEl);
+            container.appendChild(messageEl);
             
-            if (!streaming) {
-                highlightCode();
-            }
             scrollToBottom();
-            
-            return messageDiv;
+            return messageEl;
+        }
+
+        function updateMessage(messageEl, content) {
+            const textEl = messageEl.querySelector('.message-text');
+            textEl.innerHTML = formatMessage(content);
+            highlightCode();
+            scrollToBottom();
         }
 
         function formatMessage(content) {
@@ -508,42 +752,73 @@
             // Convert markdown to HTML
             let html = marked.parse(content);
             
-            // Process code blocks with custom styling
-            html = html.replace(/<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g, (match, lang, code) => {
-                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                return `
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-language">${lang}</span>
-                            <button class="copy-btn" onclick="copyCode('${codeId}')">Copy</button>
-                        </div>
-                        <div class="code-content">
-                            <pre><code class="language-${lang}" id="${codeId}">${code}</code></pre>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            // Process code blocks without language
-            html = html.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, (match, code) => {
-                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                return `
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-language">code</span>
-                            <button class="copy-btn" onclick="copyCode('${codeId}')">Copy</button>
-                        </div>
-                        <div class="code-content">
-                            <pre><code id="${codeId}">${code}</code></pre>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            // Process inline code
-            html = html.replace(/<code>(.*?)<\/code>/g, '<code class="inline-code">$1</code>');
+            // Handle inline code
+            html = html.replace(/<code>(.*?)<\/code>/g, '<code style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>');
             
             return html;
+        }
+
+        function processArtifacts(content, messageEl) {
+            const artifactRegex = /<artifact\s+type="([^"]+)"\s+id="([^"]+)"\s+title="([^"]+)">([\s\S]*?)<\/artifact>/g;
+            let match;
+            
+            while ((match = artifactRegex.exec(content)) !== null) {
+                const [fullMatch, type, id, title, artifactContent] = match;
+                
+                // Create artifact container
+                const artifactEl = document.createElement('div');
+                artifactEl.className = 'artifact-container';
+                artifactEl.innerHTML = `
+                    <div class="artifact-header">
+                        <div>
+                            <div class="artifact-title">${escapeHtml(title)}</div>
+                            <div class="artifact-type">${type}</div>
+                        </div>
+                    </div>
+                    <div class="artifact-content">
+                        <iframe class="artifact-iframe" id="artifact-${id}"></iframe>
+                    </div>
+                `;
+                
+                messageEl.querySelector('.message-content').appendChild(artifactEl);
+                
+                // Render artifact content
+                const iframe = document.getElementById(`artifact-${id}`);
+                if (type === 'text/html') {
+                    iframe.srcdoc = artifactContent;
+                } else if (type === 'application/vnd.ant.react') {
+                    // For React components, create a simple HTML wrapper
+                    const reactHtml = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+                            <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+                            <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+                        </head>
+                        <body>
+                            <div id="root"></div>
+                            <script type="text/babel">
+                                ${artifactContent}
+                                ReactDOM.render(React.createElement(App), document.getElementById('root'));
+                            </script>
+                        </body>
+                        </html>
+                    `;
+                    iframe.srcdoc = reactHtml;
+                }
+                
+                // Store artifact
+                currentArtifacts[id] = {
+                    type,
+                    title,
+                    content: artifactContent
+                };
+            }
+            
+            // Remove artifact tags from displayed message
+            const textEl = messageEl.querySelector('.message-text');
+            textEl.innerHTML = textEl.innerHTML.replace(artifactRegex, '');
         }
 
         function highlightCode() {
@@ -555,50 +830,87 @@
             });
         }
 
-        function copyCode(codeId) {
-            const codeElement = document.getElementById(codeId);
-            const text = codeElement.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const button = codeElement.closest('.code-block').querySelector('.copy-btn');
-                const originalText = button.textContent;
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('copied');
-                }, 2000);
-            });
-        }
-
         function scrollToBottom() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            const container = document.getElementById('messagesContainer');
+            container.scrollTop = container.scrollHeight;
         }
 
-        function clearConversation() {
-            if (confirm('Are you sure you want to clear the conversation? This will reset the chat history.')) {
-                conversationHistory = [];
-                const messagesDiv = document.getElementById('messages');
-                messagesDiv.innerHTML = `
-                    <div class="message ai">
-                        <div class="message-content">
-                            <p>👋 Hello! I'm <strong>Cluade</strong>, your AI assistant. I can help you with coding, writing, analysis, and much more. I'll remember our conversation context to provide better assistance!</p>
-                            <p>Feel free to ask me anything - I support code syntax highlighting and can format responses beautifully.</p>
-                        </div>
-                    </div>
-                `;
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function startNewChat() {
+            currentChatId = null;
+            currentArtifacts = {};
+            
+            // Show welcome screen
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('messagesContainer').classList.add('hidden');
+            document.getElementById('messagesContainer').innerHTML = '';
+            
+            // Clear active chat
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Focus input
+            document.getElementById('messageInput').focus();
+        }
+
+        function loadChat(chatId) {
+            if (!conversations[chatId]) return;
+            
+            currentChatId = chatId;
+            const chat = conversations[chatId];
+            
+            // Hide welcome screen
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('messagesContainer').classList.remove('hidden');
+            
+            // Clear messages
+            document.getElementById('messagesContainer').innerHTML = '';
+            
+            // Load messages
+            chat.messages.forEach(msg => {
+                addMessage(msg.content, msg.role);
+            });
+            
+            // Update active chat
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-chat-id="${chatId}"]`)?.classList.add('active');
+            
+            scrollToBottom();
+        }
+
+        function updateChatHistory() {
+            const historyEl = document.getElementById('chatHistory');
+            const sortedChats = Object.values(conversations).sort((a, b) => b.createdAt - a.createdAt);
+            
+            historyEl.innerHTML = sortedChats.map(chat => `
+                <div class="chat-item" data-chat-id="${chat.id}" onclick="loadChat('${chat.id}')">
+                    ${escapeHtml(chat.title)}
+                </div>
+            `).join('');
+        }
+
+        function saveConversations() {
+            localStorage.setItem('claude_conversations', JSON.stringify(conversations));
+        }
+
+        function loadConversations() {
+            const saved = localStorage.getItem('claude_conversations');
+            if (saved) {
+                conversations = JSON.parse(saved);
+                updateChatHistory();
             }
         }
 
         // Initialize syntax highlighting
         hljs.highlightAll();
-        
-        // Focus on input when page loads
-        window.addEventListener('load', () => {
-            document.getElementById('messageInput').focus();
-        });
     </script>
 </body>
 </html>
