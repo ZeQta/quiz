@@ -3,52 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cluade AI Chatbot</title>
+    <title>Cluade - AI Chatbot</title>
     <script src="https://js.puter.com/v2/"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <style>
-        :root {
-            --primary-color: #6e48aa;
-            --secondary-color: #9d50bb;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-            --bot-bg: #ffffff;
-            --user-bg: #f0f2f5;
-            --code-bg: #f5f5f5;
-            --border-radius: 12px;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            line-height: 1.6;
         }
-        
+
         .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            position: relative;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
+        .header h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
         .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+        }
+
+        .messages {
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
@@ -57,551 +64,541 @@
             gap: 1rem;
             scroll-behavior: smooth;
         }
-        
+
         .message {
-            max-width: 90%;
-            padding: 0.8rem 1.2rem;
-            border-radius: var(--border-radius);
-            line-height: 1.6;
-            position: relative;
+            max-width: 80%;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease-out;
-            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease-out;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .bot-message {
-            align-self: flex-start;
-            background-color: var(--bot-bg);
-            border-bottom-left-radius: 4px;
-        }
-        
-        .user-message {
+
+        .message.user {
             align-self: flex-end;
-            background-color: var(--user-bg);
-            border-bottom-right-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-bottom-right-radius: 6px;
         }
-        
-        .input-container {
-            display: flex;
-            padding: 1rem;
-            background-color: white;
-            border-top: 1px solid #e0e0e0;
-            position: sticky;
-            bottom: 0;
-            z-index: 5;
-        }
-        
-        #user-input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            outline: none;
-            font-size: 1rem;
-            transition: border 0.3s, box-shadow 0.3s;
-        }
-        
-        #user-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(110, 72, 170, 0.2);
-        }
-        
-        #send-button {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 0 1.5rem;
-            margin-left: 0.5rem;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s, opacity 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 80px;
-        }
-        
-        #send-button:hover {
-            opacity: 0.9;
-        }
-        
-        #send-button:active {
-            transform: scale(0.98);
-        }
-        
-        .typing-indicator {
-            display: none;
+
+        .message.ai {
             align-self: flex-start;
-            padding: 0.8rem 1.2rem;
-            background-color: var(--bot-bg);
-            border-radius: var(--border-radius);
-            margin-bottom: 0.5rem;
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-bottom-left-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
-        .typing-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #999;
-            margin: 0 2px;
-            animation: typing-animation 1.4s infinite ease-in-out;
+
+        .message.ai.streaming {
+            border-left: 3px solid #667eea;
         }
-        
-        .typing-dot:nth-child(1) {
-            animation-delay: 0s;
+
+        .message-content {
+            line-height: 1.6;
         }
-        
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
+
+        .message-content h1, .message-content h2, .message-content h3 {
+            margin: 1rem 0 0.5rem 0;
+            color: #2c3e50;
         }
-        
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
+
+        .message-content h1 { font-size: 1.5rem; }
+        .message-content h2 { font-size: 1.3rem; }
+        .message-content h3 { font-size: 1.1rem; }
+
+        .message-content p {
+            margin: 0.5rem 0;
         }
-        
-        @keyframes typing-animation {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
+
+        .message-content ul, .message-content ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
         }
-        
-        /* Code block styling */
-        .code-container {
+
+        .message-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+
+        .code-block {
             position: relative;
-            margin: 0.8rem 0;
+            margin: 1rem 0;
             border-radius: 8px;
             overflow: hidden;
+            background: #1e1e1e;
         }
-        
+
         .code-header {
+            background: #2d2d2d;
+            padding: 0.5rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #e0e0e0;
-            padding: 0.5rem 1rem;
-            font-family: monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
+            border-bottom: 1px solid #404040;
         }
-        
-        .code-header:hover {
-            background-color: #d0d0d0;
-        }
-        
-        .code-content {
-            display: none;
-            background-color: var(--code-bg);
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .code-content pre {
-            margin: 0;
-            padding: 1rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        
-        .code-content code {
-            font-family: inherit;
-        }
-        
-        .copy-btn {
-            background-color: rgba(0, 0, 0, 0.1);
-            border: none;
-            border-radius: 4px;
-            padding: 0.3rem 0.6rem;
-            cursor: pointer;
+
+        .code-language {
+            color: #888;
             font-size: 0.8rem;
-            transition: background-color 0.2s;
+            text-transform: uppercase;
         }
-        
-        .copy-btn:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-        
-        .copy-btn.copied {
-            background-color: #4caf50;
+
+        .copy-btn {
+            background: #667eea;
             color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
-        /* Markdown formatting */
-        .message-content p {
-            margin-bottom: 0.8rem;
+
+        .copy-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
         }
-        
-        .message-content ul, 
-        .message-content ol {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+
+        .copy-btn.copied {
+            background: #27ae60;
         }
-        
-        .message-content li {
-            margin-bottom: 0.3rem;
+
+        .code-content {
+            padding: 1rem;
+            overflow-x: auto;
         }
-        
-        .message-content strong {
+
+        .code-content code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .inline-code {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .input-area {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+        }
+
+        .input-field:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
-        .message-content em {
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
             font-style: italic;
+            margin-top: 0.5rem;
         }
-        
-        .message-content a {
-            color: var(--primary-color);
-            text-decoration: none;
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
         }
-        
-        .message-content a:hover {
-            text-decoration: underline;
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: bounce 1.4s ease-in-out infinite both;
         }
-        
-        .message-content blockquote {
-            border-left: 3px solid #ccc;
-            padding-left: 1rem;
-            margin: 0.8rem 0;
-            color: #666;
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        .clear-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: auto;
         }
-        
-        /* Mobile optimizations */
+
+        .clear-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
         @media (max-width: 768px) {
-            .message {
-                max-width: 95%;
-                padding: 0.7rem 1rem;
-            }
-            
             .header {
-                padding: 0.8rem;
+                padding: 1rem;
             }
             
-            .header h1 {
-                font-size: 1.3rem;
+            .message {
+                max-width: 90%;
+                padding: 1rem;
             }
             
-            .header p {
-                font-size: 0.9rem;
+            .input-container {
+                flex-direction: column;
             }
             
-            #user-input {
-                padding: 0.7rem 1rem;
-                font-size: 0.95rem;
-            }
-            
-            #send-button {
-                padding: 0 1rem;
-                min-width: 70px;
-            }
-            
-            .code-content {
-                max-height: 300px;
+            .send-btn {
+                align-self: flex-end;
+                padding: 0.75rem 1.5rem;
             }
         }
-        
-        /* Loading animation for streaming */
-        .streaming-cursor {
-            display: inline-block;
-            width: 8px;
-            height: 1em;
-            background-color: currentColor;
-            vertical-align: middle;
-            margin-left: 2px;
-            animation: blink 1s steps(2, start) infinite;
-        }
-        
-        @keyframes blink {
-            to { visibility: hidden; }
+
+        .hljs {
+            background: #1e1e1e !important;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Cluade AI</h1>
-        <p>Your intelligent conversational assistant</p>
+        <h1>🤖 Cluade</h1>
+        <div class="subtitle">AI Chatbot with Contextual Memory</div>
+        <button class="clear-btn" onclick="clearConversation()">Clear Chat</button>
     </div>
     
-    <div class="chat-container" id="chat-container">
-        <div class="typing-indicator" id="typing-indicator">
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <div class="message ai">
+                <div class="message-content">
+                    <p>👋 Hello! I'm <strong>Cluade</strong>, your AI assistant. I can help you with coding, writing, analysis, and much more. I'll remember our conversation context to provide better assistance!</p>
+                    <p>Feel free to ask me anything - I support code syntax highlighting and can format responses beautifully.</p>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <div class="input-container">
-        <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off" autofocus>
-        <button id="send-button">Send</button>
+        
+        <div class="input-area">
+            <div class="input-container">
+                <textarea 
+                    class="input-field" 
+                    id="messageInput" 
+                    placeholder="Type your message here..." 
+                    rows="1"
+                    onkeydown="handleKeyPress(event)"
+                ></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    Send
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatContainer = document.getElementById('chat-container');
-            const userInput = document.getElementById('user-input');
-            const sendButton = document.getElementById('send-button');
-            const typingIndicator = document.getElementById('typing-indicator');
-            
-            // Conversation history for context/memory
-            let conversationHistory = [
-                {
-                    role: "system",
-                    content: "You are Cluade, a helpful AI assistant. You provide detailed, accurate responses with proper formatting for code and text. Always maintain a friendly and professional tone. Format code blocks with proper syntax highlighting and provide clear explanations."
+        let conversationHistory = [];
+        let isStreaming = false;
+
+        // Configure marked for better rendering
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, {language: lang}).value;
                 }
-            ];
-            
-            // Initialize highlight.js for code syntax highlighting
-            hljs.highlightAll();
-            
-            // Function to escape HTML to prevent XSS
-            function escapeHtml(unsafe) {
-                return unsafe
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
             }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+
+        document.getElementById('messageInput').addEventListener('input', function() {
+            autoResize(this);
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
             
-            // Function to process markdown-like formatting
-            function processMarkdown(text) {
-                // Process bold (**text**)
-                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                // Process italic (*text*)
-                text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                // Process links ([text](url))
-                text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-                // Process blockquotes (> text)
-                text = text.replace(/^>\s(.*$)/gm, '<blockquote>$1</blockquote>');
-                // Process lists
-                text = text.replace(/^\*\s(.*$)/gm, '<li>$1</li>');
-                text = text.replace(/<li>.*<\/li>/g, function(match) {
-                    return '<ul>' + match + '</ul>';
-                });
-                // Convert line breaks to <br> for non-code sections
-                text = text.replace(/\n/g, '<br>');
-                return text;
-            }
+            if (!message || isStreaming) return;
             
-            // Function to add a message to the chat
-            function addMessage(role, content, isStreaming = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${role}-message`;
-                
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'message-content';
-                
-                // Escape HTML first for security
-                let safeContent = escapeHtml(content);
-                
-                // Process code blocks separately
-                safeContent = safeContent.replace(/```(\w*)([\s\S]*?)```/g, function(match, language, code) {
-                    const lang = language || 'plaintext';
-                    const highlightedCode = hljs.highlightAuto(code.trim(), [lang]).value;
-                    return `
-                        <div class="code-container">
-                            <div class="code-header">
-                                <span>${lang}</span>
-                                <button class="copy-btn" onclick="copyCodeToClipboard(this)">Copy</button>
-                            </div>
-                            <div class="code-content">
-                                <pre><code class="hljs ${lang}">${highlightedCode}</code></pre>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                // Process markdown formatting for non-code parts
-                safeContent = processMarkdown(safeContent);
-                
-                // Add streaming cursor if needed
-                if (isStreaming) {
-                    safeContent += '<span class="streaming-cursor"></span>';
+            // Add user message
+            addMessage(message, 'user');
+            conversationHistory.push({role: 'user', content: message});
+            
+            // Clear input and reset height
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Disable send button
+            isStreaming = true;
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            
+            // Create AI message container
+            const aiMessageDiv = addMessage('', 'ai', true);
+            const contentDiv = aiMessageDiv.querySelector('.message-content');
+            
+            // Add typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = `
+                <span>Cluade is thinking</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            contentDiv.appendChild(typingIndicator);
+            
+            try {
+                // Build context from conversation history
+                let contextPrompt = message;
+                if (conversationHistory.length > 1) {
+                    const recentHistory = conversationHistory.slice(-6); // Keep last 6 messages for context
+                    const contextMessages = recentHistory.slice(0, -1).map(msg => 
+                        `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}`
+                    ).join('\n\n');
+                    contextPrompt = `Previous conversation context:\n${contextMessages}\n\nCurrent question: ${message}`;
                 }
                 
-                contentDiv.innerHTML = safeContent;
-                messageDiv.appendChild(contentDiv);
-                chatContainer.insertBefore(messageDiv, typingIndicator);
-                
-                // Initialize code block toggles
-                initCodeBlocks();
-                
-                // Scroll to the bottom of the chat
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
-                return messageDiv;
-            }
-            
-            // Initialize code block toggle functionality
-            function initCodeBlocks() {
-                document.querySelectorAll('.code-header').forEach(header => {
-                    header.addEventListener('click', function() {
-                        const content = this.nextElementSibling;
-                        content.style.display = content.style.display === 'block' ? 'none' : 'block';
-                    });
+                const response = await puter.ai.chat(contextPrompt, {
+                    model: 'claude-sonnet-4',
+                    stream: true
                 });
-            }
-            
-            // Function to handle sending a message
-            async function sendMessage() {
-                const message = userInput.value.trim();
-                if (!message) return;
                 
-                // Add user message to chat and history
-                addMessage('user', message);
-                conversationHistory.push({ role: "user", content: message });
+                // Remove typing indicator
+                typingIndicator.remove();
                 
-                // Clear input and maintain focus
-                userInput.value = '';
-                userInput.focus();
-                
-                // Show typing indicator
-                typingIndicator.style.display = 'flex';
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
-                try {
-                    // Prepare the conversation context
-                    const messages = conversationHistory.map(msg => ({
-                        role: msg.role,
-                        content: msg.content
-                    }));
-                    
-                    // Create a placeholder for the streaming response
-                    const responseDiv = addMessage('bot', '', true);
-                    const contentDiv = responseDiv.querySelector('.message-content');
-                    
-                    // Stream the response from Claude
-                    const response = await puter.ai.chat(messages, {
-                        model: 'claude-sonnet-4',
-                        stream: true
-                    });
-                    
-                    let fullResponse = '';
-                    let buffer = '';
-                    let lastUpdate = 0;
-                    
-                    for await (const part of response) {
-                        if (part?.text) {
-                            buffer += part.text;
-                            fullResponse += part.text;
-                            
-                            // Throttle updates to improve performance
-                            const now = Date.now();
-                            if (now - lastUpdate > 50 || !part.text.trim()) {
-                                updateResponse(contentDiv, buffer, true);
-                                buffer = '';
-                                lastUpdate = now;
-                            }
-                        }
+                let fullResponse = '';
+                for await (const part of response) {
+                    if (part?.text) {
+                        fullResponse += part.text;
+                        contentDiv.innerHTML = formatMessage(fullResponse);
+                        highlightCode();
+                        scrollToBottom();
                     }
-                    
-                    // Final update with any remaining buffer
-                    if (buffer) {
-                        updateResponse(contentDiv, buffer, true);
-                    }
-                    
-                    // Remove streaming cursor
-                    const cursors = contentDiv.querySelectorAll('.streaming-cursor');
-                    cursors.forEach(cursor => cursor.remove());
-                    
-                    // Add the full response to conversation history
-                    conversationHistory.push({ role: "assistant", content: fullResponse });
-                    
-                } catch (error) {
-                    console.error("Error:", error);
-                    addMessage('bot', "Sorry, I encountered an error. Please try again.");
-                } finally {
-                    // Hide typing indicator
-                    typingIndicator.style.display = 'none';
                 }
+                
+                // Add to conversation history
+                conversationHistory.push({role: 'assistant', content: fullResponse});
+                
+                // Remove streaming class
+                aiMessageDiv.classList.remove('streaming');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.remove();
+                contentDiv.innerHTML = `<p style="color: #e74c3c;">❌ Sorry, I encountered an error. Please try again.</p>`;
             }
             
-            // Function to update the streaming response
-            function updateResponse(element, newText, isStreaming = false) {
-                const currentContent = element.innerHTML.replace(/<span class="streaming-cursor"><\/span>/, '');
-                
-                // Escape HTML first for security
-                let safeContent = escapeHtml(currentContent + newText);
-                
-                // Process code blocks
-                safeContent = safeContent.replace(/```(\w*)([\s\S]*?)```/g, function(match, language, code) {
-                    const lang = language || 'plaintext';
-                    const highlightedCode = hljs.highlightAuto(code.trim(), [lang]).value;
-                    return `
-                        <div class="code-container">
-                            <div class="code-header">
-                                <span>${lang}</span>
-                                <button class="copy-btn" onclick="copyCodeToClipboard(this)">Copy</button>
-                            </div>
-                            <div class="code-content">
-                                <pre><code class="hljs ${lang}">${highlightedCode}</code></pre>
-                            </div>
+            // Re-enable send button
+            isStreaming = false;
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+            
+            scrollToBottom();
+        }
+
+        function addMessage(content, sender, streaming = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}${streaming ? ' streaming' : ''}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (sender === 'user') {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.innerHTML = formatMessage(content);
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            messagesDiv.appendChild(messageDiv);
+            
+            if (!streaming) {
+                highlightCode();
+            }
+            scrollToBottom();
+            
+            return messageDiv;
+        }
+
+        function formatMessage(content) {
+            if (!content) return '';
+            
+            // Convert markdown to HTML
+            let html = marked.parse(content);
+            
+            // Process code blocks with custom styling
+            html = html.replace(/<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g, (match, lang, code) => {
+                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+                return `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">${lang}</span>
+                            <button class="copy-btn" onclick="copyCode('${codeId}')">Copy</button>
                         </div>
-                    `;
-                });
-                
-                // Process markdown formatting for non-code parts
-                safeContent = processMarkdown(safeContent);
-                
-                // Add streaming cursor if needed
-                if (isStreaming) {
-                    safeContent += '<span class="streaming-cursor"></span>';
-                }
-                
-                element.innerHTML = safeContent;
-                
-                // Initialize code block toggles for new content
-                initCodeBlocks();
-                
-                // Scroll to the bottom if near the bottom
-                const isNearBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 100;
-                if (isNearBottom) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }
-            }
-            
-            // Event listeners
-            sendButton.addEventListener('click', sendMessage);
-            
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
+                        <div class="code-content">
+                            <pre><code class="language-${lang}" id="${codeId}">${code}</code></pre>
+                        </div>
+                    </div>
+                `;
             });
             
-            // Initial greeting
-            setTimeout(() => {
-                addMessage('bot', "Hello! I'm Cluade, your AI assistant. How can I help you today?\n\nI can:\n* Answer questions\n* Explain concepts\n* Format code with syntax highlighting\n* Maintain conversation context\n\nTry asking me anything!");
-                conversationHistory.push({ 
-                    role: "assistant", 
-                    content: "Hello! I'm Cluade, your AI assistant. How can I help you today?\n\nI can:\n* Answer questions\n* Explain concepts\n* Format code with syntax highlighting\n* Maintain conversation context\n\nTry asking me anything!" 
-                });
-            }, 500);
-        });
-        
-        // Global function for copying code
-        function copyCodeToClipboard(button) {
-            const codeBlock = button.closest('.code-container').querySelector('code');
-            const textToCopy = codeBlock.textContent;
+            // Process code blocks without language
+            html = html.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, (match, code) => {
+                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+                return `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">code</span>
+                            <button class="copy-btn" onclick="copyCode('${codeId}')">Copy</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code id="${codeId}">${code}</code></pre>
+                        </div>
+                    </div>
+                `;
+            });
             
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                setTimeout(() => {
-                    button.textContent = 'Copy';
-                    button.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
+            // Process inline code
+            html = html.replace(/<code>(.*?)<\/code>/g, '<code class="inline-code">$1</code>');
+            
+            return html;
+        }
+
+        function highlightCode() {
+            document.querySelectorAll('pre code').forEach((block) => {
+                if (!block.dataset.highlighted) {
+                    hljs.highlightElement(block);
+                    block.dataset.highlighted = 'yes';
+                }
             });
         }
+
+        function copyCode(codeId) {
+            const codeElement = document.getElementById(codeId);
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const button = codeElement.closest('.code-block').querySelector('.copy-btn');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function clearConversation() {
+            if (confirm('Are you sure you want to clear the conversation? This will reset the chat history.')) {
+                conversationHistory = [];
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML = `
+                    <div class="message ai">
+                        <div class="message-content">
+                            <p>👋 Hello! I'm <strong>Cluade</strong>, your AI assistant. I can help you with coding, writing, analysis, and much more. I'll remember our conversation context to provide better assistance!</p>
+                            <p>Feel free to ask me anything - I support code syntax highlighting and can format responses beautifully.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            document.getElementById('messageInput').focus();
+        });
     </script>
 </body>
 </html>
